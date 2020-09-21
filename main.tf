@@ -60,30 +60,24 @@ data "aws_ami" "centos" {
 }
 
 resource "aws_instance" "bastion" {
-  ami                    = "${length(var.ami) > 0 ? var.ami : data.aws_ami.centos.id}"
+  ami                    = "length(var.ami) > 0 ? var.ami : data.aws_ami.centos.id"
   source_dest_check      = false
-  instance_type          = "${var.instance_type}"
-  subnet_id              = "${var.subnet_id}"
-  key_name               = "${var.key_name}"
-  vpc_security_group_ids = ["${split(",",var.security_groups)}"]
+  instance_type          = "var.instance_type"
+  subnet_id              = "var.subnet_id"
+  key_name               = "var.key_name"
+  vpc_security_group_ids = ["split(",",var.security_groups)"]
   monitoring             = true
 
-  tags = "${merge(var.tags, map(
-    "Name", "${var.name}-bastion",
-    "Environment", var.environment
-  ))}"
+  tags = merge(var.tags, map( "Name", "var.name-bastion", "Environment", var.environment))
 }
 
 resource "aws_eip" "bastion" {
-  instance = "${aws_instance.bastion.id}"
+  instance = "aws_instance.bastion.id"
   vpc      = true
 
-  tags = "${merge(var.tags, map(
-    "Name", "${var.name}-bastion-eip",
-    "Environment", var.environment
-  ))}"
+  tags = merge(var.tags, map( "Name", "var.name-bastion-eip", "Environment", var.environment))
 }
 
 output "public_ip" {
-  value = "${aws_eip.bastion.public_ip}"
+  value = "aws_eip.bastion.public_ip"
 }
